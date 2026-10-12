@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EWB Edu Tech — Student Record Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <span class="brand-title">EWB Edu Tech</span>
+          <span class="brand-subtitle">Student Records Portal</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="7" height="9" x="3" y="3" rx="1"/>
+            <rect width="7" height="5" x="14" y="3" rx="1"/>
+            <rect width="7" height="9" x="14" y="12" rx="1"/>
+            <rect width="7" height="5" x="3" y="16" rx="1"/>
+          </svg>
+          <span>Dashboard Overview</span>
+        </button>
+
+        <button class="nav-item" id="nav-students" onclick="switchTab('students')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Student Directory</span>
+        </button>
+
+        <button class="nav-item" id="nav-ai" onclick="switchTab('ai')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a8 8 0 0 0-8 8c0 3.3 2 6.2 5 7.4V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.6c3-1.2 5-4.1 5-7.4a8 8 0 0 0-8-8z"/>
+            <path d="m9 9 3 3 3-3"/>
+          </svg>
+          <span>AI Academic Assistant</span>
+          <span class="badge-mini">Ollama</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="api-links">
+          <a href="/docs" target="_blank" class="api-pill" title="Swagger Interactive API Docs">
+            <span>Swagger API</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+          <a href="/redoc" target="_blank" class="api-pill" title="ReDoc API Reference">
+            <span>ReDoc</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="topbar">
+        <div class="header-breadcrumb">
+          <h1 id="page-heading">Dashboard Overview</h1>
+          <span class="system-status-badge" id="system-status">
+            <span class="status-dot"></span>
+            <span id="status-text">FastAPI & SQLite Active</span>
+          </span>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="btn btn-secondary" onclick="refreshCurrentView()" id="btn-refresh" title="Reload data">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            </svg>
+            <span>Refresh</span>
+          </button>
+          <button class="btn btn-primary" onclick="openStudentModal()" id="btn-add-student">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span>Add Student</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Alert / Toast Container -->
+      <div id="toast-container" class="toast-container"></div>
+
+      <!-- Tab 1: Dashboard Overview -->
+      <section id="tab-dashboard" class="tab-pane active">
+        <!-- Stat KPI Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon icon-blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="stat-meta">
+              <span class="stat-label">Total Registered Students</span>
+              <h2 class="stat-value" id="kpi-total-students">—</h2>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-indigo">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                <path d="M6 6h10M6 10h10"/>
+              </svg>
+            </div>
+            <div class="stat-meta">
+              <span class="stat-label">Active Academic Courses</span>
+              <h2 class="stat-value" id="kpi-total-courses">—</h2>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-emerald">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="stat-meta">
+              <span class="stat-label">Database Persistence</span>
+              <h2 class="stat-value text-success" id="kpi-db-status">SQLite Connected</h2>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Two-Column Grid -->
+        <div class="dashboard-columns">
+          <!-- Course Distribution Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Course Enrollment Distribution</h3>
+                <p class="card-subtitle">Real-time student headcount across academic disciplines</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="course-distribution-list" class="distribution-list">
+                <div class="loading-state">Loading distribution metrics...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recently Enrolled Students Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Recently Enrolled Students</h3>
+                <p class="card-subtitle">Latest additions to the student database</p>
+              </div>
+              <button class="btn btn-text" onclick="switchTab('students')">View All &rarr;</button>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Student</th>
+                      <th>Course</th>
+                      <th>Enrollment Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-students-tbody">
+                    <tr><td colspan="4" class="text-center py-4">Loading recent records...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: Student Directory -->
+      <section id="tab-students" class="tab-pane">
+        <div class="card">
+          <!-- Directory Toolbar -->
+          <div class="directory-toolbar">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" id="filter-search" placeholder="Search by student name..." autocomplete="off">
+            </div>
+
+            <div class="toolbar-actions">
+              <select id="filter-course" class="select-input">
+                <option value="">All Courses</option>
+              </select>
+
+              <button class="btn btn-secondary" onclick="resetFilters()" id="btn-clear-filters" title="Reset all search filters">
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- Directory Table Count Info -->
+          <div class="table-meta-bar">
+            <span id="results-count-text">Showing records...</span>
+          </div>
+
+          <!-- Student Table -->
+          <div class="table-container">
+            <table class="data-table" id="students-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">ID</th>
+                  <th>Student Name</th>
+                  <th>Contact Information</th>
+                  <th>Course</th>
+                  <th>Date of Birth</th>
+                  <th>Enrollment Date</th>
+                  <th style="width: 140px; text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody">
+                <tr><td colspan="7" class="text-center py-8">Loading student directory...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar">
+            <div class="pagination-info" id="pagination-info">
+              Page 1 of 1
+            </div>
+            <div class="pagination-controls">
+              <button class="btn btn-secondary btn-sm" id="btn-prev-page" onclick="prevPage()" disabled>
+                &larr; Previous
+              </button>
+              <span id="page-indicator" class="page-indicator">1</span>
+              <button class="btn btn-secondary btn-sm" id="btn-next-page" onclick="nextPage()" disabled>
+                Next &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Local AI Assistant -->
+      <section id="tab-ai" class="tab-pane">
+        <div class="card ai-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Academic AI Assistant</h3>
+              <p class="card-subtitle">Natural language queries powered by controlled backend analytics and Ollama</p>
+            </div>
+            <span class="badge badge-accent">Local & Secure</span>
+          </div>
+
+          <div class="card-body">
+            <!-- Preset Questions -->
+            <div class="quick-prompts">
+              <span class="quick-prompt-label">Try asking:</span>
+              <button class="pill-btn" onclick="askPreset('How many students are there?')">How many students are there?</button>
+              <button class="pill-btn" onclick="askPreset('How many students are enrolled in Data Science?')">Data Science enrollment?</button>
+              <button class="pill-btn" onclick="askPreset('Which students were born after 2002?')">Born after 2002?</button>
+              <button class="pill-btn" onclick="askPreset('Summarize the student records by course')">Course distribution summary</button>
+            </div>
+
+            <!-- Query Input -->
+            <form id="ai-query-form" class="ai-input-form" onsubmit="handleAISubmit(event)">
+              <div class="ai-input-group">
+                <input type="text" id="ai-question-input" placeholder="Type an academic record question (e.g. 'How many students in AI course?')..." required maxlength="300">
+                <button type="submit" class="btn btn-primary" id="btn-ask-ai">
+                  <span id="ai-btn-text">Ask Assistant</span>
+                  <div class="spinner" id="ai-spinner" style="display: none;"></div>
+                </button>
+              </div>
+            </form>
+
+            <!-- AI Response Box -->
+            <div id="ai-response-box" class="ai-response-box" style="display: none;">
+              <div class="ai-response-header">
+                <div class="ai-avatar">AI</div>
+                <div class="ai-source-badge" id="ai-source-badge">Verified Backend Facts</div>
+              </div>
+              <div class="ai-response-body" id="ai-response-text"></div>
+              <div class="ai-facts-preview" id="ai-facts-preview" style="display: none;">
+                <strong>Verified Database Facts:</strong>
+                <pre id="ai-facts-json"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Student Form (Create / Edit) -->
+  <div id="student-modal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-title">Register New Student</h3>
+        <button class="modal-close" onclick="closeStudentModal()">&times;</button>
+      </div>
+
+      <form id="student-form" onsubmit="handleStudentFormSubmit(event)">
+        <input type="hidden" id="student-id-field">
+        <div class="modal-body">
+          <div id="form-error-banner" class="alert alert-danger" style="display: none;"></div>
+
+          <div class="form-grid">
+            <!-- Name (Required) -->
+            <div class="form-group col-span-2">
+              <label for="form-name">Full Name <span class="required-star">*</span></label>
+              <input type="text" id="form-name" required maxlength="100" placeholder="e.g. Aditi Sharma" class="form-control">
+              <small class="form-hint">Required. Full official student name.</small>
+            </div>
+
+            <!-- Date of Birth (Required) -->
+            <div class="form-group">
+              <label for="form-dob">Date of Birth <span class="required-star">*</span></label>
+              <input type="date" id="form-dob" required class="form-control">
+              <small class="form-hint">Required valid date.</small>
+            </div>
+
+            <!-- Enrollment Date (Optional) -->
+            <div class="form-group">
+              <label for="form-enrollment-date">Enrollment Date</label>
+              <input type="date" id="form-enrollment-date" class="form-control">
+              <small class="form-hint">Optional official admission date.</small>
+            </div>
+
+            <!-- Email (Optional) -->
+            <div class="form-group">
+              <label for="form-email">Email Address</label>
+              <input type="email" id="form-email" maxlength="255" placeholder="student@ewbedutech.org" class="form-control">
+              <small class="form-hint">Optional. Validated format.</small>
+            </div>
+
+            <!-- Phone (Optional) -->
+            <div class="form-group">
+              <label for="form-phone">Phone Number</label>
+              <input type="tel" id="form-phone" maxlength="50" placeholder="+91 98765 43210" class="form-control">
+              <small class="form-hint">Optional contact phone number.</small>
+            </div>
+
+            <!-- Contact Notice -->
+            <div class="col-span-2 contact-policy-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span><strong>Contact Policy:</strong> At least one contact method (Email or Phone) must be provided.</span>
+            </div>
+
+            <!-- Course (Optional) -->
+            <div class="form-group col-span-2">
+              <label for="form-course">Course / Department</label>
+              <input type="text" id="form-course" list="course-suggestions" placeholder="e.g. Artificial Intelligence, Computer Science" class="form-control">
+              <datalist id="course-suggestions">
+                <option value="Artificial Intelligence">
+                <option value="Computer Science">
+                <option value="Data Science">
+                <option value="Cybersecurity">
+                <option value="Cloud Computing">
+                <option value="Information Technology">
+              </datalist>
+            </div>
+
+            <!-- Address (Optional) -->
+            <div class="form-group col-span-2">
+              <label for="form-address">Residential Address</label>
+              <textarea id="form-address" rows="2" maxlength="255" placeholder="Street address, city, state, postal code" class="form-control"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-student">
+            <span id="save-btn-text">Save Student Record</span>
+            <div class="spinner" id="save-spinner" style="display: none;"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Student Profile View -->
+  <div id="profile-modal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Student Profile Card</h3>
+        <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-header-card">
+          <div class="profile-avatar" id="prof-avatar">ST</div>
+          <div class="profile-title-info">
+            <h2 id="prof-name">—</h2>
+            <span class="badge badge-course" id="prof-course">—</span>
+          </div>
+        </div>
+
+        <div class="profile-details-grid">
+          <div class="profile-item">
+            <span class="profile-label">Student ID</span>
+            <span class="profile-val" id="prof-id">—</span>
+          </div>
+          <div class="profile-item">
+            <span class="profile-label">Date of Birth</span>
+            <span class="profile-val" id="prof-dob">—</span>
+          </div>
+          <div class="profile-item">
+            <span class="profile-label">Email Address</span>
+            <span class="profile-val" id="prof-email">—</span>
+          </div>
+          <div class="profile-item">
+            <span class="profile-label">Phone Number</span>
+            <span class="profile-val" id="prof-phone">—</span>
+          </div>
+          <div class="profile-item">
+            <span class="profile-label">Enrollment Date</span>
+            <span class="profile-val" id="prof-enrollment">—</span>
+          </div>
+          <div class="profile-item">
+            <span class="profile-label">Created At</span>
+            <span class="profile-val" id="prof-created">—</span>
+          </div>
+          <div class="profile-item col-span-2">
+            <span class="profile-label">Address</span>
+            <span class="profile-val" id="prof-address">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeProfileModal()">Close</button>
+        <button type="button" class="btn btn-primary" id="btn-profile-edit" onclick="editFromProfile()">Edit Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Delete Confirmation -->
+  <div id="delete-modal" class="modal-backdrop">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h3>Confirm Student Deletion</h3>
+        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div>
+            <p>Are you sure you want to permanently delete this student record?</p>
+            <p class="delete-student-target"><strong>Student:</strong> <span id="del-student-name">—</span> (ID: <span id="del-student-id">—</span>)</p>
+            <p class="text-muted text-xs">This action is irreversible and will remove the record from SQLite.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete" onclick="executeDeleteStudent()">
+          <span>Delete Student</span>
+          <div class="spinner" id="del-spinner" style="display: none;"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
